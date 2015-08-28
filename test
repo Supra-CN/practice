@@ -1,0 +1,23 @@
+#!/bin/sh
+
+printf "Is it morning? Please answer yes or no : "
+
+while [ "$timeofday" != "quit" ]
+do
+    read timeofday
+
+    if [ "$timeofday" = "yes" ]
+    then
+	echo "Good morning"
+    elif [ "$timeofday" = "no" ]
+    then
+	echo "Good afternoon"
+    else
+	printf "Sorry, $timeofday not recognized, Enter yes or no : "
+    fi
+
+done
+
+echo "quit"
+
+exit 0

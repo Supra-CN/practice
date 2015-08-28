@@ -1,0 +1,20 @@
+#!/bin/sh
+
+printf "Is it moring? Please answer yes or no : "
+read timeofday
+
+case "$timeofday" in
+    [yY] | [Yy][Ee][Ss] ) 
+	echo "Good Morning"
+	echo "Good Afternoon"
+	;;
+    [nN]* ) 
+	echo "Good Afternoon"
+	;;
+    * ) 
+	echo "Sorry, answer not recongnized"
+	echo "Please answer yes or no"
+	;;
+esac
+
+exit 0

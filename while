@@ -1,0 +1,14 @@
+#!/bin/sh
+
+printf "Enter password : "
+read trythis
+
+while [ "$trythis" != "supra" ]
+do
+	printf "Sorry, try again : "
+	read trythis
+done
+
+echo "pass !"
+
+exit 0

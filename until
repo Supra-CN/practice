@@ -1,0 +1,11 @@
+#!/bin/sh
+
+until ls | grep "$1" > /dev/null 
+do
+    sleep 1
+done
+
+# now ring the bell and announce the expected user
+
+echo "**** $1 has just created ****"
+exit 0

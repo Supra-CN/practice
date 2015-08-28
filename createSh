@@ -1,0 +1,21 @@
+#!/bin/sh
+
+# 安全创建可执行的sh文件
+if [ $# -le 0 ]
+then
+    echo "usage : $0 [file1] [file2] ..."
+    exit 0
+fi
+
+for file in $@
+do
+    if [ -e $file ]; then
+	echo "$file already exists"
+    else
+	echo '#!/bin/sh' > $file
+	chmod +x $file
+	echo "$file created"
+    fi
+done
+echo "done !"
+exit 0
