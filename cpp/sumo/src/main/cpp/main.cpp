@@ -16,8 +16,9 @@ void greeting(bool ask) {
               << std::endl;
 }
 
-void bye() {
+int finish() {
     std::cout << "bye";
+    return 0;
 }
 
 void playGame() {
@@ -69,8 +70,7 @@ void playGame() {
 int main() {
     greeting(false);
     playGame();
-    bye();
-    return 0;
+    return finish();
 }
 
 
