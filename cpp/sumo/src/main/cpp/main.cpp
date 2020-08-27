@@ -5,6 +5,11 @@
 
 //using namespace std;
 
+/**
+ * 问候语
+ *
+ * @param ask 是否读 player 姓名
+ */
 void greeting(bool ask) {
     std::string name = "there";
     if (ask) {
@@ -16,11 +21,19 @@ void greeting(bool ask) {
               << std::endl;
 }
 
+/**
+ * 结束
+ *
+ * @return 返回状态码
+ */
 int finish() {
     std::cout << "bye";
     return 0;
 }
 
+/**
+ * 开始游戏
+ */
 void playGame() {
     std::string exit = "exit";
     int last = 2;
@@ -67,6 +80,11 @@ void playGame() {
     }
 }
 
+/**
+ * 主方法
+ *
+ * @return 返回状态码
+ */
 int main() {
     greeting(false);
     playGame();
