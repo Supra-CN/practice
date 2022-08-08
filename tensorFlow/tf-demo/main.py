@@ -2,6 +2,8 @@
 
 # Press ⌃R to execute it or replace it with your code.
 # Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
+
+import tf_gpu_config
 import random
 import sys
 
@@ -10,6 +12,17 @@ from tensorflow import keras
 import numpy as np
 import matplotlib.pyplot as plt
 
+# gpus = tf.config.list_physical_devices('GPU')
+# if gpus:
+#   try:
+#     # Currently, memory growth needs to be the same across GPUs
+#     for gpu in gpus:
+#       tf.config.experimental.set_memory_growth(gpu, True)
+#     logical_gpus = tf.config.list_logical_devices('GPU')
+#     print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
+#   except RuntimeError as e:
+#     # Memory growth must be set before GPUs have been initialized
+#     print(e)
 
 def tf_demo_fashion_mnist():
     print(f'tf version: {tf.__version__}')
@@ -57,6 +70,7 @@ def tf_demo_fashion_mnist():
 
     model = keras.Sequential([
         keras.layers.Flatten(input_shape=(28, 28)),
+        keras.layers.Dense(512, activation='relu'),
         keras.layers.Dense(128, activation='relu'),
         keras.layers.Dense(10)
     ])
@@ -139,7 +153,9 @@ def tf_demo_mnist():
 
     model = tf.keras.models.Sequential([
         tf.keras.layers.Flatten(input_shape=(28, 28)),
+        tf.keras.layers.Dense(512, activation='relu'),
         tf.keras.layers.Dense(128, activation='relu'),
+        tf.keras.layers.Dense(64, activation='relu'),
         tf.keras.layers.Dropout(0.2),
         tf.keras.layers.Dense(10, activation='softmax')
     ])
@@ -209,6 +225,7 @@ def tf_demo_try():
 
     model = keras.Sequential([
         # keras.layers.Flatten(input_shape=(28, 28)),
+        keras.layers.Dense(512),
         keras.layers.Dense(128),
         # keras.layers.Dense(128, activation='relu'),
         keras.layers.Dense(1)
@@ -226,8 +243,10 @@ def tf_demo_try():
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     print_hi('PyCharm')
-    # tf_demo_mnist()
+
+    # with tf.device("/cpu:0"):
+    tf_demo_mnist()
     # tf_demo_fashion_mnist()
-    tf_demo_try()
+        # tf_demo_try()
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/

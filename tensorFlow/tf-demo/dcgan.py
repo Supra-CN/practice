@@ -2,6 +2,8 @@
 """
 一元一次函數中weights和biases的優化
 """
+
+import tf_gpu_config
 import sys
 from tabulate import tabulate
 
@@ -16,7 +18,25 @@ from tensorflow.keras import layers
 import time
 # import tensorflow_docs.vis.embed as embed
 
+import torch
+
 from IPython import display
+
+# gpus = tf.config.list_physical_devices('GPU')
+# if gpus:
+#     try:
+#         # Currently, memory growth needs to be the same across GPUs
+#         for gpu in gpus:
+#             # tf.config.experimental.set_memory_growth(gpu, True)
+#             tf.config.set_logical_device_configuration(
+#                 gpu, [tf.config.experimental.VirtualDeviceConfiguration(
+#                     memory_limit=512)])
+#         logical_gpus = tf.config.list_logical_devices('GPU')
+#         print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
+#     except RuntimeError as e:
+#         # Memory growth must be set before GPUs have been initialized
+#         print(e)
+
 
 def transposing(data):
     return list(map(list, zip(*data)))
@@ -51,9 +71,10 @@ def make_data(size, smp_max=sys.maxsize, smp_mix=-sys.maxsize - 1, show=False):
         print(f'tag: {tags}')
     return [np.array(samples, dtype=float), np.array(tags, dtype=float)]
 
+
 def make_generator_model():
     model = tf.keras.Sequential()
-    model.add(layers.Dense(7*7*256, use_bias=False, input_shape=(100,)))
+    model.add(layers.Dense(7 * 7 * 256, use_bias=False, input_shape=(100,)))
     model.add(layers.BatchNormalization())
     model.add(layers.LeakyReLU())
 
@@ -75,10 +96,11 @@ def make_generator_model():
 
     return model
 
+
 def make_discriminator_model():
     model = tf.keras.Sequential()
     model.add(layers.Conv2D(64, (5, 5), strides=(2, 2), padding='same',
-                                     input_shape=[28, 28, 1]))
+                            input_shape=[28, 28, 1]))
     model.add(layers.LeakyReLU())
     model.add(layers.Dropout(0.3))
 
@@ -91,14 +113,17 @@ def make_discriminator_model():
 
     return model
 
+
 def discriminator_loss(real_output, fake_output):
     real_loss = cross_entropy(tf.ones_like(real_output), real_output)
     fake_loss = cross_entropy(tf.zeros_like(fake_output), fake_output)
     total_loss = real_loss + fake_loss
     return total_loss
 
+
 def generator_loss(fake_output):
     return cross_entropy(tf.ones_like(fake_output), fake_output)
+
 
 # Notice the use of `tf.function`
 # This annotation causes the function to be "compiled".
@@ -107,19 +132,20 @@ def train_step(images):
     noise = tf.random.normal([BATCH_SIZE, noise_dim])
 
     with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape:
-      generated_images = generator(noise, training=True)
+        generated_images = generator(noise, training=True)
 
-      real_output = discriminator(images, training=True)
-      fake_output = discriminator(generated_images, training=True)
+        real_output = discriminator(images, training=True)
+        fake_output = discriminator(generated_images, training=True)
 
-      gen_loss = generator_loss(fake_output)
-      disc_loss = discriminator_loss(real_output, fake_output)
+        gen_loss = generator_loss(fake_output)
+        disc_loss = discriminator_loss(real_output, fake_output)
 
     gradients_of_generator = gen_tape.gradient(gen_loss, generator.trainable_variables)
     gradients_of_discriminator = disc_tape.gradient(disc_loss, discriminator.trainable_variables)
 
     generator_optimizer.apply_gradients(zip(gradients_of_generator, generator.trainable_variables))
     discriminator_optimizer.apply_gradients(zip(gradients_of_discriminator, discriminator.trainable_variables))
+
 
 def train(dataset, epochs):
     for epoch in range(epochs):
@@ -146,25 +172,26 @@ def train(dataset, epochs):
                              epochs,
                              seed)
 
+
 def generate_and_save_images(model, epoch, test_input):
-  # Notice `training` is set to False.
-  # This is so all layers run in inference mode (batchnorm).
-  predictions = model(test_input, training=False)
+    # Notice `training` is set to False.
+    # This is so all layers run in inference mode (batchnorm).
+    predictions = model(test_input, training=False)
 
-  fig = plt.figure(figsize=(4, 4))
+    fig = plt.figure(figsize=(4, 4))
 
-  for i in range(predictions.shape[0]):
-      plt.subplot(4, 4, i+1)
-      plt.imshow(predictions[i, :, :, 0] * 127.5 + 127.5, cmap='gray')
-      plt.axis('off')
+    for i in range(predictions.shape[0]):
+        plt.subplot(4, 4, i + 1)
+        plt.imshow(predictions[i, :, :, 0] * 127.5 + 127.5, cmap='gray')
+        plt.axis('off')
 
-  plt.savefig('image_at_epoch_{:04d}.png'.format(epoch))
-  plt.show()
+    plt.savefig('image_at_epoch_{:04d}.png'.format(epoch))
+    plt.show()
 
 
 # Display a single image using the epoch number
 def display_image(epoch_no):
-  return PIL.Image.open('image_at_epoch_{:04d}.png'.format(epoch_no))
+    return PIL.Image.open('image_at_epoch_{:04d}.png'.format(epoch_no))
 
 
 print(f'tf.__version__ -> {tf.__version__}')
