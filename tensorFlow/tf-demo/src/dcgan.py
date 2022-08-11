@@ -16,7 +16,7 @@ import os
 import PIL
 from tensorflow.keras import layers
 import time
-# import tensorflow_docs.vis.embed as embed
+import tensorflow_docs.vis.embed as embed
 
 import torch
 
@@ -221,7 +221,7 @@ cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=True)
 generator_optimizer = tf.keras.optimizers.Adam(1e-4)
 discriminator_optimizer = tf.keras.optimizers.Adam(1e-4)
 
-checkpoint_dir = './training_checkpoints'
+checkpoint_dir = '../demo_gen/training_checkpoints'
 checkpoint_prefix = os.path.join(checkpoint_dir, "ckpt")
 checkpoint = tf.train.Checkpoint(generator_optimizer=generator_optimizer,
                                  discriminator_optimizer=discriminator_optimizer,
@@ -251,4 +251,4 @@ with imageio.get_writer(anim_file, mode='I') as writer:
     image = imageio.imread(filename)
     writer.append_data(image)
 
-# embed.embed_file(anim_file)
+embed.embed_file(anim_file)

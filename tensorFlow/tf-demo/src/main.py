@@ -145,28 +145,6 @@ def tf_demo_fashion_mnist():
     print(f'{np.argmax(predictions_single[0])}')
 
 
-def tf_demo_mnist():
-    mnist = tf.keras.datasets.mnist
-
-    (x_train, y_train), (x_test, y_test) = mnist.load_data()
-    x_train, x_test = x_train / 255.0, x_test / 255.0
-
-    model = tf.keras.models.Sequential([
-        tf.keras.layers.Flatten(input_shape=(28, 28)),
-        tf.keras.layers.Dense(512, activation='relu'),
-        tf.keras.layers.Dense(128, activation='relu'),
-        tf.keras.layers.Dense(64, activation='relu'),
-        tf.keras.layers.Dropout(0.2),
-        tf.keras.layers.Dense(10, activation='softmax')
-    ])
-
-    model.compile(optimizer='adam',
-                  loss='sparse_categorical_crossentropy',
-                  metrics=['accuracy'])
-
-    model.fit(x_train, y_train, epochs=5)
-    model.evaluate(x_test, y_test)
-
 def plot_image(i, predictions_array, true_label, img, class_names):
     predictions_array, true_label, img = predictions_array, true_label[i], img[i]
     plt.grid(False)
