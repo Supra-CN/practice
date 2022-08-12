@@ -2,10 +2,10 @@
 """
 一元一次函數中weights和biases的優化
 """
-
-import tf_gpu_config
+import pathlib
 import sys
 from tabulate import tabulate
+from pathlib import Path
 
 import tensorflow as tf
 import numpy as np
@@ -17,10 +17,28 @@ import PIL
 from tensorflow.keras import layers
 import time
 import tensorflow_docs.vis.embed as embed
+from src import configs, path_utils
+from src import path_utils
 
-import torch
+# import torch
+
+# from tensorflow.compat.v1 import ConfigProto
+# from tensorflow.compat.v1 import InteractiveSession
+#
+# config = ConfigProto()
+# config.gpu_options.allow_growth = True
+# session = InteractiveSession(config=config)
 
 from IPython import display
+
+from src import tf_gpu_config
+
+demo_gen_dir = path_utils.require_dir(Path(configs.gen_out_dir, 'dcgen'))
+train_out_dir = path_utils.require_dir(Path(demo_gen_dir, 'train'))
+
+# tf_gpu_config.set_no_gpu()
+tf_gpu_config.set_memory_growth()
+
 
 # gpus = tf.config.list_physical_devices('GPU')
 # if gpus:
@@ -40,7 +58,6 @@ from IPython import display
 
 def transposing(data):
     return list(map(list, zip(*data)))
-
 
 def transposed_table(data, headers):
     return tabulate(transposing(data), headers=headers)
@@ -185,13 +202,16 @@ def generate_and_save_images(model, epoch, test_input):
         plt.imshow(predictions[i, :, :, 0] * 127.5 + 127.5, cmap='gray')
         plt.axis('off')
 
-    plt.savefig('image_at_epoch_{:04d}.png'.format(epoch))
-    plt.show()
+    # save_path =  os.path.join(demo_gen_dir, 'image_at_epoch_{:04d}.png'.format(epoch))
+    save_path =  Path(train_out_dir, 'image_at_epoch_{:04d}.png'.format(epoch))
+    plt.savefig(save_path)
+    # plt.show()
 
 
 # Display a single image using the epoch number
 def display_image(epoch_no):
-    return PIL.Image.open('image_at_epoch_{:04d}.png'.format(epoch_no))
+    path = Path(demo_gen_dir, 'image_at_epoch_{:04d}.png'.format(epoch_no))
+    return PIL.Image.open(path)
 
 
 print(f'tf.__version__ -> {tf.__version__}')
@@ -221,7 +241,7 @@ cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=True)
 generator_optimizer = tf.keras.optimizers.Adam(1e-4)
 discriminator_optimizer = tf.keras.optimizers.Adam(1e-4)
 
-checkpoint_dir = '../demo_gen/training_checkpoints'
+checkpoint_dir = os.path.join(demo_gen_dir,'training_checkpoints')
 checkpoint_prefix = os.path.join(checkpoint_dir, "ckpt")
 checkpoint = tf.train.Checkpoint(generator_optimizer=generator_optimizer,
                                  discriminator_optimizer=discriminator_optimizer,
@@ -240,10 +260,10 @@ train(train_dataset, EPOCHS)
 
 checkpoint.restore(tf.train.latest_checkpoint(checkpoint_dir))
 
-anim_file = 'dcgan.gif'
+anim_file = path_utils.require_dir(Path(demo_gen_dir, 'dcgan.gif'))
 
 with imageio.get_writer(anim_file, mode='I') as writer:
-    filenames = glob.glob('image*.png')
+    filenames = glob.glob('image*.png', root_dir=demo_gen_dir)
     filenames = sorted(filenames)
     for filename in filenames:
         image = imageio.imread(filename)

@@ -223,8 +223,8 @@ if __name__ == '__main__':
     print_hi('PyCharm')
 
     # with tf.device("/cpu:0"):
-    tf_demo_mnist()
-    # tf_demo_fashion_mnist()
+    # tf_demo_mnist()
+    tf_demo_fashion_mnist()
         # tf_demo_try()
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/

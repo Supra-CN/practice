@@ -2,7 +2,8 @@ import tensorflow as tf
 
 import tf_gpu_config
 
-tf_gpu_config.set_no_gpu()
+# tf_gpu_config.set_no_gpu()
+# tf_gpu_config.set_memory_growth()
 
 mnist = tf.keras.datasets.mnist
 

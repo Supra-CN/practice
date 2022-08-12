@@ -1,7 +1,13 @@
 import collections
+import pathlib
+from datetime import datetime
+from time import time
+
 import gym
 import numpy as np
 import statistics
+
+import tensorflow
 import tensorflow as tf
 import tqdm
 
@@ -9,15 +15,17 @@ from matplotlib import pyplot as plt
 from tensorflow.keras import layers
 from typing import Any, List, Sequence, Tuple
 
-# from src import tf_gpu_config
+# Create the environment
+import tensorflow_docs.vis.embed as embed
+
+from src import tf_gpu_config
 
 # tf_gpu_config.set_no_gpu()
 
 
-# Create the environment
-import tensorflow_docs.vis.embed as embed
-
-env = gym.make("CartPole-v0")
+env = gym.make("CartPole-v0", render_mode="single_rgb_array")
+# env = gym.make("CartPole-v0", render_mode="rgb_array")
+# env = gym.make("CartPole-v0", render_mode="human")
 
 # Set seed for experiment reproducibility
 # seed = 42
@@ -70,6 +78,9 @@ def env_step(action: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Returns state, reward and done flag given an action."""
 
     state, reward, done, _ = env.step(action)
+    # print(f'env_step:: state = {state}')
+    # print(f'env_step:: reward = {reward}')
+    # print(f'env_step:: done = {done}')
     return (state.astype(np.float32),
             np.array(reward, np.int32),
             np.array(done, np.int32))
@@ -214,14 +225,21 @@ def train_step(
 
 # %%time
 
-min_episodes_criterion = 100
-max_episodes = 100
-max_steps_per_episode = 10000
+# min_episodes_criterion = 5
+# max_episodes = 5
+# max_steps_per_episode = 50
+
+# min_episodes_criterion = 10
+# max_episodes = 1000
+# max_steps_per_episode = 100
+
+min_episodes_criterion = 1000
+max_episodes = 10000
+max_steps_per_episode = 100000
 
 # Cartpole-v0 is considered solved if average reward is >= 195 over 100
 # consecutive trials
 reward_threshold = 195
-reward_threshold = 1950
 running_reward = 0
 
 # Discount factor for future rewards
@@ -261,9 +279,12 @@ from pyvirtualdisplay import Display
 display = Display(visible=0, size=(400, 300))
 display.start()
 
-
 def render_episode(env: gym.Env, model: tf.keras.Model, max_steps: int):
-    screen = env.render(mode='rgb_array')
+    # screen = env.render(mode='single_rgb_array')
+    # screen = env.render(mode='rgb_array')
+    screen = env.render()
+    print(f'screen[init] type = {type(screen)} size = {len(screen)} shape = {screen.shape}')
+
     im = Image.fromarray(screen)
 
     images = [im]
@@ -279,7 +300,9 @@ def render_episode(env: gym.Env, model: tf.keras.Model, max_steps: int):
 
         # Render screen every 10 steps
         if i % 10 == 0:
-            screen = env.render(mode='rgb_array')
+            # screen = env.render(mode='single_rgb_array')
+            # screen = env.render(mode='rgb_array')
+            screen = env.render()
             images.append(Image.fromarray(screen))
 
         if done:
@@ -288,11 +311,14 @@ def render_episode(env: gym.Env, model: tf.keras.Model, max_steps: int):
     return images
 
 
-# Save GIF image
-images = render_episode(env, model, max_steps_per_episode)
-image_file = 'cartpole-v0.gif'
-# loop=0: loop forever, duration=1: play each frame for 1ms
-images[0].save(
-    image_file, save_all=True, append_images=images[1:], loop=0, duration=1)
+def save_gif(dir_p='out', info='train'):
+    # Save GIF image
+    images = render_episode(env, model, max_steps_per_episode)
+    image_file = f'{dir_p}/cartpole-v0-{info}-{datetime.now().time()}.gif'
+    # loop=0: loop forever, duration=1: play each frame for 1ms
+    images[0].save(
+        image_file, save_all=True, append_images=images[1:], loop=0, duration=1)
 
-embed.embed_file(image_file)
+    embed.embed_file(image_file)
+
+save_gif(dir_p='out',info='best')
