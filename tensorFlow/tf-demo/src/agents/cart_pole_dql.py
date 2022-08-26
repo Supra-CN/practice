@@ -45,9 +45,11 @@ Hyperparameters
 超参数
 '''
 
-num_iterations = 20000 # @param {type:"integer"}
-
+# num_iterations = 20000 # @param {type:"integer"}
+#
+num_iterations = 4000 # @param {type:"integer"}
 # num_iterations = 2000 # @param {type:"integer"}
+# num_iterations = 200 # @param {type:"integer"}
 
 initial_collect_steps = 100  # @param {type:"integer"}
 collect_steps_per_iteration =   1# @param {type:"integer"}
@@ -296,7 +298,7 @@ creating an average return.
 The following function computes the average return of a policy, given the policy, environment, and a number of episodes.
 '''
 
-def compute_avg_return(environment, policy, num_episodes=10):
+def compute_avg_return(environment, policy, num_episodes=10, render=False):
 
   total_return = 0.0
   for _ in range(num_episodes):
@@ -308,6 +310,9 @@ def compute_avg_return(environment, policy, num_episodes=10):
       action_step = policy.action(time_step)
       time_step = environment.step(action_step.action)
       episode_return += time_step.reward
+      if(render):
+        environment.render(mode=gym_env_render_mode)
+
     total_return += episode_return
 
   avg_return = total_return / num_episodes
@@ -491,25 +496,38 @@ collect_driver = py_driver.PyDriver(
     [rb_observer],
     max_steps=collect_steps_per_iteration)
 
+print(f'iterator.size at 0 = {iterator.__sizeof__()}):')
 print(f'for _ in range(num_iterations = {num_iterations}):')
-for _ in range(num_iterations):
+for i in range(num_iterations):
 
   # Collect a few steps and save to the replay buffer.
-  time_step, _ = collect_driver.run(time_step)
+  # print(f'iterator.size at loop[{i}] start = {iterator.__sizeof__()}):')
+
+  time_step, unused_info_run = collect_driver.run(time_step)
+
+  # print(f'iterator.size at loop[{i}] run = {iterator.__sizeof__()}):')
 
   # Sample a batch of data from the buffer and update the agent's network.
   experience, unused_info = next(iterator)
+
+  # print(f'iterator.size at loop[{i}] nest = {iterator.__sizeof__()}):')
+
   train_loss = agent.train(experience).loss
 
   step = agent.train_step_counter.numpy()
 
   if step % log_interval == 0:
-    print(f'step = {step}: loss = {train_loss}')
+    print(f'loop = {i}: step = {step}: loss = {train_loss}')
+    print(f'    time_step = {time_step}')
+    # print(f'    unused_info_run = {unused_info_run}')
+    # print(f'    experience = {experience}')
+    # print(f'    unused_info = {unused_info}')
 
   if step % eval_interval == 0:
     avg_return = compute_avg_return(eval_env, agent.policy, num_eval_episodes)
     print(f'step = {step}: Average Return = {avg_return}')
     returns.append(avg_return)
+    print(f'step = {step}: Average Returns = {returns}')
 
 print(f'for _ in range(num_iterations = {num_iterations}): end')
 
