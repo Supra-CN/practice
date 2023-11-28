@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
-FROM python:3.7-alpine
+FROM python:3-slim
 
-WORKDIR /cph4/web
+WORKDIR /practice-llm/app
 
 EXPOSE 5000
 
@@ -15,9 +15,11 @@ ENV FLASK_APP=app.py
 ENV FLASK_RUN_HOST=0.0.0.0
 
 # setup alpine image
-RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apk/repositories
+#RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apk/repositories
 
-RUN apk add --no-cache gcc musl-dev linux-headers
+#RUN apk add --no-cache gcc musl-dev linux-headers
+
+RUN pip install --upgrade pip
 
 # COPY requirements.txt requirements.txt
 COPY . .
@@ -28,7 +30,7 @@ RUN pip install -r requirements.txt
 
 # Creates a non-root user with an explicit UID and adds permission to access the /cph4-web folder
 # For more info, please refer to https://aka.ms/vscode-docker-python-configure-containers
-RUN adduser -u 5678 --disabled-password --gecos "" appuser && chown -R appuser /cph4/web
+RUN adduser -u 5678 --disabled-password --gecos "" appuser && chown -R appuser /practice-llm/app
 USER appuser
 
 # CMD ["flask", "run"]

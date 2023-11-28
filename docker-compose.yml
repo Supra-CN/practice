@@ -12,7 +12,10 @@ services:
 
   jupyter:
 #    build: ./jupyter-lsp
-    image: ghcr.io/maastrichtu-ids/jupyterlab:latest
+#    image: ghcr.io/maastrichtu-ids/jupyterlab:latest
+    image: mcfonsecalab/jupyterlab
+    env_file:
+      - openai.env
 #    image: jupyter/scipy-notebook:2023-06-01
 #    image: tensorflow/tensorflow
 #    image: tensorflow/tensorflow:latest-gpu-jupyter
@@ -23,6 +26,8 @@ services:
 #      - ./examples/llama-index/paul_graham_essay:/tf/notebooks
       - ~/:/home/jovyan/work
 #      - ./examples/llama-index/paul_graham_essay:/practice-llm/paul_graham_essay
+    depends_on:
+      - v2ray
 
   v2ray:
     image: v2ray/official

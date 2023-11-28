@@ -1,6 +1,14 @@
 # This already contains the python, r, julia, latex, and nodejs runtimes
 FROM jupyter/datascience-notebook@sha256:73a577b006b496e1a1c02f5be432f4aab969c456881c4789e0df77c89a0a60c2
 
+COPY ./.condarc $HOME/
+
+RUN ls -alh $HOME/
+
+RUN cat $HOME/.condarc
+
+RUN conda info --all
+
 RUN conda install --quiet --yes --freeze-installed -c conda-forge \
     'python-language-server' \
     'jupyterlab=3.6.0' \
@@ -17,7 +25,6 @@ RUN conda install --quiet --yes --freeze-installed -c conda-forge \
     /home/$NB_USER/.cache/yarn \
   && fix-permissions $CONDA_DIR \
   && fix-permissions /home/$NB_USER
-
 
 #FROM jupyter/all-spark-notebook@sha256:a8de290d3f499123b23618a5811b2aacc969ad0675ac3b7562bed5d5e68c64d5
 
