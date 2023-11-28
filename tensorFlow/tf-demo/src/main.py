@@ -3,11 +3,26 @@
 # Press ⌃R to execute it or replace it with your code.
 # Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
 
+import tf_gpu_config
+import random
+import sys
+
 import tensorflow as tf
 from tensorflow import keras
 import numpy as np
 import matplotlib.pyplot as plt
 
+# gpus = tf.config.list_physical_devices('GPU')
+# if gpus:
+#   try:
+#     # Currently, memory growth needs to be the same across GPUs
+#     for gpu in gpus:
+#       tf.config.experimental.set_memory_growth(gpu, True)
+#     logical_gpus = tf.config.list_logical_devices('GPU')
+#     print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
+#   except RuntimeError as e:
+#     # Memory growth must be set before GPUs have been initialized
+#     print(e)
 
 def tf_demo_fashion_mnist():
     print(f'tf version: {tf.__version__}')
@@ -55,6 +70,7 @@ def tf_demo_fashion_mnist():
 
     model = keras.Sequential([
         keras.layers.Flatten(input_shape=(28, 28)),
+        keras.layers.Dense(512, activation='relu'),
         keras.layers.Dense(128, activation='relu'),
         keras.layers.Dense(10)
     ])
@@ -92,25 +108,26 @@ def tf_demo_fashion_mnist():
     plt.show()
 
     index = 0
-    max = 100
-    while (index < max and index < len(test_labels)):
+    max_index = 100
+    while index < max_index and index < len(test_labels):
         # Plot the first X test images, their predicted labels, and the true labels.
         # Color correct predictions in blue and incorrect predictions in red.
         num_rows = 5
         num_cols = 4
         num_images = num_rows * num_cols
-        index += num_images
+        # index += num_images
         plt.figure(figsize=(2 * 2 * num_cols, 2 * num_rows))
         for i in range(num_images):
             plt.subplot(num_rows, 2 * num_cols, 2 * i + 1)
-            plot_image(i, predictions[i], test_labels, test_images, class_names)
+            plot_image(index, predictions[index], test_labels, test_images, class_names)
             plt.subplot(num_rows, 2 * num_cols, 2 * i + 2)
-            plot_value_array(i, predictions[i], test_labels)
+            plot_value_array(index, predictions[index], test_labels)
+            index += 1
         plt.tight_layout()
         plt.show()
 
-        # Grab an image from the test dataset.
-        img = test_images[1]
+    # Grab an image from the test dataset.
+    img = test_images[1]
 
     print(f'img.shape sample: {img.shape}')
     # Add the image to a batch where it's the only member.
@@ -127,26 +144,6 @@ def tf_demo_fashion_mnist():
 
     print(f'{np.argmax(predictions_single[0])}')
 
-
-def tf_demo_mnist():
-    mnist = tf.keras.datasets.mnist
-
-    (x_train, y_train), (x_test, y_test) = mnist.load_data()
-    x_train, x_test = x_train / 255.0, x_test / 255.0
-
-    model = tf.keras.models.Sequential([
-        tf.keras.layers.Flatten(input_shape=(28, 28)),
-        tf.keras.layers.Dense(128, activation='relu'),
-        tf.keras.layers.Dropout(0.2),
-        tf.keras.layers.Dense(10, activation='softmax')
-    ])
-
-    model.compile(optimizer='adam',
-                  loss='sparse_categorical_crossentropy',
-                  metrics=['accuracy'])
-
-    model.fit(x_train, y_train, epochs=5)
-    model.evaluate(x_test, y_test)
 
 def plot_image(i, predictions_array, true_label, img, class_names):
     predictions_array, true_label, img = predictions_array, true_label[i], img[i]
@@ -184,10 +181,50 @@ def print_hi(name):
     # Use a breakpoint in the code line below to debug your script.
     print(f'Hi, {name}')  # Press ⌘F8 to toggle the breakpoint.
 
+def tf_demo_try():
+
+    train_smps = []
+    train_tags = []
+    train_range = 3
+    smp_max = sys.maxsize
+    smp_mix = -sys.maxsize - 1
+    print(f'===')
+    print(f'smp_max: {smp_max}')
+    print(f'smp_mix: {smp_mix}')
+
+    for i in range(train_range):
+        sample = random.randint(smp_mix, smp_max)
+        train_smps.append(sample)
+        train_tags.append(round(sample / 2))
+
+    print(f'===')
+    print(f'smp: {train_smps}')
+    print(f'tag: {train_tags}')
+
+    model = keras.Sequential([
+        # keras.layers.Flatten(input_shape=(28, 28)),
+        keras.layers.Dense(512),
+        keras.layers.Dense(128),
+        # keras.layers.Dense(128, activation='relu'),
+        keras.layers.Dense(1)
+    ])
+    #
+    # model.compile(optimizer='adam',
+    #               loss='sparse_categorical_crossentropy',
+    #               metrics=['accuracy'])
+    #
+    # model.fit(x_train, y_train, epochs=5)
+    #
+    # model.evaluate(x_test, y_test)
+
+
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     print_hi('PyCharm')
+
+    # with tf.device("/cpu:0"):
     # tf_demo_mnist()
     tf_demo_fashion_mnist()
+        # tf_demo_try()
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
