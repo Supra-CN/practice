@@ -1,0 +1,39 @@
+name: practice-llm
+
+services:
+#  app:
+#    build: ./app
+#    ports:
+#      - 8000:5000
+#    volumes:
+#      - ./app:/practice-llm/app
+#    environment:
+#      FLASK_DEBUG: "true"
+
+  jupyter:
+#    build: ./jupyter-lsp
+#    image: ghcr.io/maastrichtu-ids/jupyterlab:latest
+    image: mcfonsecalab/jupyterlab
+    env_file:
+      - openai.env
+#    image: jupyter/scipy-notebook:2023-06-01
+#    image: tensorflow/tensorflow
+#    image: tensorflow/tensorflow:latest-gpu-jupyter
+    ports:
+      - 8888:8888
+#    build: ./examples/llama-index/paul_graham_essay
+    volumes:
+#      - ./examples/llama-index/paul_graham_essay:/tf/notebooks
+      - ~/:/home/jovyan/work
+#      - ./examples/llama-index/paul_graham_essay:/practice-llm/paul_graham_essay
+    depends_on:
+      - v2ray
+
+  v2ray:
+    image: v2ray/official
+    ports:
+      - 8228:8118
+      - 2080:1080
+    volumes:
+      - ~/.v2ray:/etc/v2ray
+    command: v2ray -config=/etc/v2ray/config.json
