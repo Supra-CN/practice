@@ -22,6 +22,7 @@ import tensorflow_docs.vis.embed as embed
 from src import tf_gpu_config
 
 # tf_gpu_config.set_no_gpu()
+tf_gpu_config.set_memory_growth()
 
 '''
 初始化gym环境
