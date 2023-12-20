@@ -12,7 +12,8 @@ import tensorflow as tf
 import tqdm
 
 from matplotlib import pyplot as plt
-from tensorflow.keras import layers
+# from tensorflow.keras import layers
+from tensorflow.python.keras import layers
 from typing import Any, List, Sequence, Tuple
 
 # Create the environment
@@ -22,7 +23,9 @@ from src import tf_gpu_config
 
 # tf_gpu_config.set_no_gpu()
 
-
+'''
+初始化gym环境
+'''
 env = gym.make("CartPole-v0", render_mode="single_rgb_array")
 # env = gym.make("CartPole-v0", render_mode="rgb_array")
 # env = gym.make("CartPole-v0", render_mode="human")
