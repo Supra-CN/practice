@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "80:80"
+
+  postgres:
+    build:
+      context: .
+      dockerfile: Dockerfile.pg-ubuntu
+    container_name: pg-with-sqlite-fdw
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: mydb
+    volumes:
+      - ${HOME}/data:/var/lib/postgresql/data
+      - ${HOME}/var/db:/data
+    ports:
+      - "5432:5432"

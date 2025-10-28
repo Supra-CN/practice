@@ -1,0 +1,35 @@
+# 使用 Ubuntu 作为基础镜像
+FROM ubuntu:latest
+
+# 更新并安装所需的依赖
+RUN apt-get update && apt-get install -y \
+    gnupg \
+    lsb-release \
+    wget \
+    build-essential \
+    git \
+    libsqlite3-dev
+
+# 添加 PostgreSQL 官方仓库并安装 PostgreSQL 和 PostGIS
+RUN echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list && \
+    wget -qO - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - && \
+    apt-get update && \
+    apt-get install -y postgresql-13 postgresql-13-postgis-3 postgresql-server-dev-13
+
+# 克隆 sqlite_fdw 源码并编译安装
+RUN git clone https://github.com/pgspider/sqlite_fdw.git && \
+    cd sqlite_fdw && \
+    make && \
+    make install && \
+    rm -rf /var/lib/apt/lists/*
+
+# 设置 PostgreSQL 的环境变量
+ENV POSTGRES_USER postgres
+ENV POSTGRES_PASSWORD postgres
+ENV POSTGRES_DB mydb
+
+# 暴露 PostgreSQL 默认端口
+EXPOSE 5432
+
+# 启动 PostgreSQL 服务
+CMD service postgresql start && tail -f /dev/null

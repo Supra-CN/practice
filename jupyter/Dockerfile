@@ -1,5 +1,5 @@
 # This already contains the python, r, julia, latex, and nodejs runtimes
-FROM jupyter/all-spark-notebook
+FROM quay.io/jupyter/all-spark-notebook
 
 COPY ./.condarc $HOME/
 
@@ -30,24 +30,30 @@ RUN conda info --all
 USER root
 
 # 备份并替换 apt 源列表为清华镜像源
-RUN mv /etc/apt/sources.list /etc/apt/sources.list.bak && \
-    echo "deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal main restricted universe multiverse" > /etc/apt/sources.list && \
-    echo "deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal-updates main restricted universe multiverse" >> /etc/apt/sources.list && \
-    echo "deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal-backports main restricted universe multiverse" >> /etc/apt/sources.list && \
-    echo "deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal-security main restricted universe multiverse" >> /etc/apt/sources.list
+# RUN mv /etc/apt/sources.list /etc/apt/sources.list.bak && \
+#     echo "deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal main restricted universe multiverse" > /etc/apt/sources.list && \
+#     echo "deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal-updates main restricted universe multiverse" >> /etc/apt/sources.list && \
+#     echo "deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal-backports main restricted universe multiverse" >> /etc/apt/sources.list && \
+#     echo "deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal-security main restricted universe multiverse" >> /etc/apt/sources.list
 
-# 更新 apt-get 并安装必要的工具
-RUN apt-get update
-RUN apt-get install -y nodejs npm curl
+# 更新 apt 并安装必要的工具
+RUN apt update
+RUN apt install -y nodejs npm curl
 
 # 配置 pip 使用清华镜像源
-RUN mkdir -p /root/.pip && \
-    echo "[global]" > /root/.pip/pip.conf && \
-    echo "index-url = https://pypi.tuna.tsinghua.edu.cn/simple" >> /root/.pip/pip.conf
+# RUN mkdir -p /root/.pip && \
+#     echo "[global]" > /root/.pip/pip.conf && \
+#     echo "index-url = https://pypi.tuna.tsinghua.edu.cn/simple" >> /root/.pip/pip.conf
 
 # 安装 Python 的 LSP 服务器和相关插件
-RUN pip install jupyterlab jupyter-lsp \
-    'python-lsp-server[all]' pylsp-mypy pyls-black pyls-isort jedi-language-server pyright
+RUN pip install jupyterlab
+RUN pip install jupyter-lsp
+RUN pip install 'python-lsp-server[all]' 
+RUN pip install pylsp-mypy
+RUN pip install pyls-black
+RUN pip install pyls-isort
+RUN pip install jedi-language-server
+RUN pip install pyright
 RUN pip install ChatTTS
 
 RUN export NODE_MIRROR=https://mirrors.tuna.tsinghua.edu.cn/nodejs-release/

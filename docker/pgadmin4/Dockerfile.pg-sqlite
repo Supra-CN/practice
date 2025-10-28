@@ -1,0 +1,14 @@
+FROM postgis/postgis:latest
+
+RUN apt-get update && \
+    apt-get install -y git build-essential postgresql-server-dev-13 libsqlite3-dev && \
+    git clone https://github.com/pgspider/sqlite_fdw.git && \
+    cd sqlite_fdw && \
+    make && \
+    make install && \
+    rm -rf /var/lib/apt/lists/*
+    
+# 设置默认数据库启动
+ENV POSTGRES_USER postgres
+ENV POSTGRES_PASSWORD postgres
+ENV POSTGRES_DB mydb
